@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,24 +6,51 @@ import {
   StyleSheet,
   Switch,
   Platform,
+  TextInput,
+  ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/screen-container';
 import { useColors } from '@/hooks/use-colors';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeContext } from '@/lib/theme-provider';
+import { getPlayerName, savePlayerName, getSoundEnabled, saveSoundEnabled } from '@/lib/storage/player-storage';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const colors = useColors();
   const { colorScheme, setColorScheme } = useThemeContext();
+  const [playerName, setPlayerName] = useState('');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
 
   const isDark = colorScheme === 'dark';
 
+  useEffect(() => {
+    const loadSettings = async () => {
+      const name = await getPlayerName();
+      const soundEnabled = await getSoundEnabled();
+      if (name) setPlayerName(name);
+      setSoundEnabled(soundEnabled);
+    };
+    loadSettings();
+  }, []);
+
+  const handleSavePlayerName = async (name: string) => {
+    setPlayerName(name);
+    if (name.trim()) {
+      await savePlayerName(name.trim());
+    }
+  };
+
+  const handleSoundToggle = async (value: boolean) => {
+    setSoundEnabled(value);
+    await saveSoundEnabled(value);
+  };
+
   return (
     <ScreenContainer>
+      <ScrollView>
       <View style={styles.container}>
         {/* ヘッダー */}
         <View style={styles.header}>
@@ -39,6 +66,35 @@ export default function SettingsScreen() {
 
         {/* 設定項目 */}
         <View style={styles.settingsList}>
+          {/* プレイヤー名 */}
+          <Text style={[styles.sectionLabel, { color: colors.muted }]}>プレイヤー</Text>
+          <View style={[styles.settingsGroup, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={styles.settingRow}>
+              <View style={styles.settingInfo}>
+                <Text style={[styles.settingLabel, { color: colors.foreground }]}>ニックネーム</Text>
+                <Text style={[styles.settingDesc, { color: colors.muted }]}>
+                  ゲームで使用する名前
+                </Text>
+              </View>
+            </View>
+            <TextInput
+              value={playerName}
+              onChangeText={handleSavePlayerName}
+              placeholder="ニックネームを入力"
+              placeholderTextColor={colors.muted}
+              style={[
+                styles.textInput,
+                {
+                  backgroundColor: colors.background,
+                  borderColor: colors.border,
+                  color: colors.foreground,
+                }
+              ]}
+              maxLength={20}
+              returnKeyType="done"
+            />
+          </View>
+
           {/* 外観 */}
           <Text style={[styles.sectionLabel, { color: colors.muted }]}>外観</Text>
           <View style={[styles.settingsGroup, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -70,7 +126,7 @@ export default function SettingsScreen() {
               </View>
               <Switch
                 value={soundEnabled}
-                onValueChange={setSoundEnabled}
+                onValueChange={handleSoundToggle}
                 trackColor={{ false: colors.border, true: colors.primary }}
                 thumbColor="#fff"
               />
@@ -103,6 +159,7 @@ export default function SettingsScreen() {
           </View>
         </View>
       </View>
+      </ScrollView>
     </ScreenContainer>
   );
 }
@@ -169,5 +226,14 @@ const styles = StyleSheet.create({
   divider: {
     height: 0.5,
     marginHorizontal: 16,
+  },
+  textInput: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    fontSize: 16,
+    marginHorizontal: 16,
+    marginBottom: 12,
   },
 });

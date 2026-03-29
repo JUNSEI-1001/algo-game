@@ -126,6 +126,18 @@ export default function HomeScreen() {
           <Pressable
             onPress={() => {
               handlePress();
+              router.push('/stats' as any);
+            }}
+            style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+          >
+            <Text style={[styles.footerLink, { color: colors.primary }]}>
+              戦績
+            </Text>
+          </Pressable>
+          <Text style={[styles.footerDivider, { color: colors.border }]}>|</Text>
+          <Pressable
+            onPress={() => {
+              handlePress();
               router.push('/settings' as any);
             }}
             style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}

@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
   Pressable,
   StyleSheet,
   ScrollView,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { ScreenContainer } from '@/components/screen-container';
 import { useColors } from '@/hooks/use-colors';
 import { useGame } from '@/lib/algo/game-context';
 import { AlgoCard } from '@/components/algo/AlgoCard';
+import { saveGameRecord } from '@/lib/storage/game-history';
+import { getPlayerName } from '@/lib/storage/player-storage';
 
 export default function ResultScreen() {
   const router = useRouter();
@@ -21,12 +25,41 @@ export default function ResultScreen() {
   const isWinner = gameState.winner === humanPlayerId;
   const winner = gameState.players.find(p => p.id === gameState.winner);
   
+  // ゲーム履歴を保存
+  useEffect(() => {
+    const saveResult = async () => {
+      try {
+        const playerName = await getPlayerName();
+        await saveGameRecord({
+          mode: 'ai',
+          playerCount: gameState.playerCount,
+          playerName: playerName || 'あなた',
+          result: isWinner ? 'win' : 'lose',
+          turnCount: gameState.turnCount,
+          opponentNames: gameState.players
+            .filter(p => p.id !== humanPlayerId)
+            .map(p => p.name),
+        });
+      } catch (error) {
+        console.error('Failed to save game record:', error);
+      }
+    };
+    
+    saveResult();
+  }, [gameState]);
+  
   const handlePlayAgain = () => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     resetGame();
     router.replace('/game/ai-setup' as any);
   };
   
   const handleGoHome = () => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     resetGame();
     router.replace('/');
   };
@@ -45,7 +78,7 @@ export default function ResultScreen() {
           <Text style={[styles.resultSubtitle, { color: colors.muted }]}>
             {isWinner
               ? 'おめでとうございます！'
-              : `${winner?.name}の勝利です`}
+              : `${winner?.name || '相手'}の勝利です`}
           </Text>
           <Text style={[styles.turnCount, { color: colors.muted }]}>
             {gameState.turnCount}ターン
