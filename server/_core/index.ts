@@ -3,9 +3,11 @@ import express from "express";
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
+import { Server as SocketIOServer } from "socket.io";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
+import { setupOnlineGame } from "../online-game";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise((resolve) => {
@@ -75,8 +77,20 @@ async function startServer() {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
+  // Socket.IO setup for online game
+  const io = new SocketIOServer(server, {
+    cors: {
+      origin: '*',
+      methods: ['GET', 'POST'],
+      credentials: true,
+    },
+    path: '/api/socket.io',
+  });
+  setupOnlineGame(io);
+
   server.listen(port, () => {
     console.log(`[api] server listening on port ${port}`);
+    console.log(`[socket.io] online game server ready`);
   });
 }
 
