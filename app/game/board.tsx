@@ -408,6 +408,7 @@ export default function GameBoardScreen() {
           setShowAttackModal(false);
           setSelectedTarget(null);
         }}
+        isFirstAttack={gameState.turnCount === 0}
       />
     </ScreenContainer>
   );

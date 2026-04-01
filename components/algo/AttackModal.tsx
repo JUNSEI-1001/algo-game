@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ interface AttackModalProps {
   targetPlayerName: string;
   onConfirm: (guess: number) => void;
   onCancel: () => void;
+  isFirstAttack?: boolean; // 1回目のアタックかどうか
 }
 
 export function AttackModal({
@@ -27,6 +28,7 @@ export function AttackModal({
   targetPlayerName,
   onConfirm,
   onCancel,
+  isFirstAttack = false,
 }: AttackModalProps) {
   const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
   const colors = useColors();
@@ -120,19 +122,28 @@ export function AttackModal({
             ))}
           </View>
           
+          {/* 1回目のアタック時の注記 */}
+          {isFirstAttack && (
+            <Text style={[styles.firstAttackNote, { color: colors.warning || '#f59e0b' }]}>
+              ※ 1回目のアタックはパスできません
+            </Text>
+          )}
+          
           {/* ボタン */}
           <View style={styles.buttonRow}>
-            <Pressable
-              onPress={handleCancel}
-              style={({ pressed }) => [
-                styles.cancelButton,
-                { borderColor: colors.border, opacity: pressed ? 0.7 : 1 }
-              ]}
-            >
-              <Text style={[styles.cancelButtonText, { color: colors.muted }]}>
-                キャンセル
-              </Text>
-            </Pressable>
+            {!isFirstAttack && (
+              <Pressable
+                onPress={handleCancel}
+                style={({ pressed }) => [
+                  styles.cancelButton,
+                  { borderColor: colors.border, opacity: pressed ? 0.7 : 1 }
+                ]}
+              >
+                <Text style={[styles.cancelButtonText, { color: colors.muted }]}>
+                  パス
+                </Text>
+              </Pressable>
+            )}
             
             <Pressable
               onPress={handleConfirm}
@@ -152,6 +163,7 @@ export function AttackModal({
                 アタック！
               </Text>
             </Pressable>
+            {isFirstAttack && <View style={{ flex: 1 }} />}
           </View>
         </View>
       </View>
@@ -239,5 +251,11 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     fontSize: 16,
     fontWeight: '700',
+  },
+  firstAttackNote: {
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 12,
   },
 });

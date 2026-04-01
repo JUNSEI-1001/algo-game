@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -43,6 +43,7 @@ export function AlgoCard({
   }, [card.isRevealed]);
   
   const shouldShowNumber = isOwn || card.isRevealed;
+  const displayNumber = card.number !== undefined && card.number !== null ? String(card.number) : '?';
   
   const frontStyle = useAnimatedStyle(() => ({
     opacity: interpolate(flipAnim.value, [0, 0.5, 1], [0, 0, 1]),
@@ -112,7 +113,7 @@ export function AlgoCard({
               color: isWhite ? '#1a1a2e' : '#f8f8f8',
             }
           ]}>
-            {card.number}
+            {displayNumber}
           </Text>
         )}
         {!shouldShowNumber && (
@@ -151,40 +152,33 @@ export function AlgoCard({
 const styles = StyleSheet.create({
   cardContainer: {
     position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cardFace: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backfaceVisibility: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 3,
   },
-  cardBack: {
+  cardFace: {
+    position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
+    backfaceVisibility: 'hidden',
+  },
+  cardBack: {
+    backgroundColor: '#2a2a3e',
   },
   cardNumber: {
     fontWeight: '800',
-    textAlign: 'center',
+    letterSpacing: 1,
   },
   cardBackPattern: {
     fontWeight: '700',
-    textAlign: 'center',
   },
   selectedIndicator: {
     position: 'absolute',
-    top: -3,
-    left: -3,
-    right: -3,
-    bottom: -3,
     borderWidth: 2,
     borderColor: '#4a9eff',
-    backgroundColor: 'transparent',
+    width: '100%',
+    height: '100%',
   },
 });
