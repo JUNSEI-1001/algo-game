@@ -44,10 +44,10 @@ export function AlgoCard({
   
   // 数字を表示すべきかどうか：自分のカード OR 表になったカード
   const shouldShowNumber = isOwn || card.isRevealed;
-  // 表示する数字：有効な数字があれば表示、なければ「？」
-  const displayNumber = (card.number === undefined || card.number === null || card.number === -1) 
-    ? '?' 
-    : String(card.number);
+  // 表示する数字
+  const displayNumber = (card.number !== undefined && card.number !== null && card.number >= 0) 
+    ? String(card.number) 
+    : '?';
   
   const frontStyle = useAnimatedStyle(() => ({
     opacity: interpolate(flipAnim.value, [0, 0.5, 1], [0, 0, 1]),
@@ -109,24 +109,15 @@ export function AlgoCard({
           frontStyle,
         ]}
       >
-        {shouldShowNumber ? (
-          <Text style={[
-            styles.cardNumber,
-            {
-              fontSize: cardSize.fontSize,
-              color: isWhite ? '#1a1a2e' : '#f8f8f8',
-            }
-          ]}>
-            {displayNumber}
-          </Text>
-        ) : (
-          <Text style={[
-            styles.cardBackPattern,
-            { color: isWhite ? '#bbb' : '#444', fontSize: cardSize.fontSize * 0.6 }
-          ]}>
-            ?
-          </Text>
-        )}
+        <Text style={[
+          styles.cardNumber,
+          {
+            fontSize: cardSize.fontSize,
+            color: isWhite ? '#1a1a2e' : '#f8f8f8',
+          }
+        ]}>
+          {shouldShowNumber ? displayNumber : '?'}
+        </Text>
       </Animated.View>
       
       {/* 選択インジケーター */}

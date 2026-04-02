@@ -33,9 +33,9 @@ export function shuffleDeck(deck: Card[]): Card[] {
 export function sortCards(cards: Card[]): Card[] {
   return [...cards].sort((a, b) => {
     if (a.number !== b.number) return a.number - b.number;
-    // 同じ数字の場合：白が左、黒が右
-    if (a.color === 'white' && b.color === 'black') return -1;
-    if (a.color === 'black' && b.color === 'white') return 1;
+    // 同じ数字の場合：黒が左、白が右
+    if (a.color === 'black' && b.color === 'white') return -1;
+    if (a.color === 'white' && b.color === 'black') return 1;
     return 0;
   });
 }
