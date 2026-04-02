@@ -408,7 +408,7 @@ export default function GameBoardScreen() {
           setShowAttackModal(false);
           setSelectedTarget(null);
         }}
-        isFirstAttack={gameState.turnCount === 0}
+        isFirstAttack={!gameState.drawnCard && !gameState.lastAttack}
       />
     </ScreenContainer>
   );

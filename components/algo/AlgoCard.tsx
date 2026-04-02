@@ -40,10 +40,14 @@ export function AlgoCard({
     if (card.isRevealed) {
       flipAnim.value = withTiming(1, { duration: 400 });
     }
-  }, [card.isRevealed]);
+  }, [card.isRevealed, flipAnim]);
   
+  // 数字を表示すべきかどうか：自分のカード OR 表になったカード
   const shouldShowNumber = isOwn || card.isRevealed;
-  const displayNumber = card.number !== undefined && card.number !== null ? String(card.number) : '?';
+  // 表示する数字：有効な数字があれば表示、なければ「？」
+  const displayNumber = (card.number !== undefined && card.number !== null && card.number >= 0) 
+    ? String(card.number) 
+    : '?';
   
   const frontStyle = useAnimatedStyle(() => ({
     opacity: interpolate(flipAnim.value, [0, 0.5, 1], [0, 0, 1]),
@@ -105,7 +109,7 @@ export function AlgoCard({
           frontStyle,
         ]}
       >
-        {shouldShowNumber && (
+        {shouldShowNumber ? (
           <Text style={[
             styles.cardNumber,
             {
@@ -115,8 +119,7 @@ export function AlgoCard({
           ]}>
             {displayNumber}
           </Text>
-        )}
-        {!shouldShowNumber && (
+        ) : (
           <Text style={[
             styles.cardBackPattern,
             { color: isWhite ? '#bbb' : '#444', fontSize: cardSize.fontSize * 0.6 }
