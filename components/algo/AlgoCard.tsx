@@ -45,9 +45,9 @@ export function AlgoCard({
   // 数字を表示すべきかどうか：自分のカード OR 表になったカード
   const shouldShowNumber = isOwn || card.isRevealed;
   // 表示する数字：有効な数字があれば表示、なければ「？」
-  const displayNumber = (card.number !== undefined && card.number !== null && card.number >= 0) 
-    ? String(card.number) 
-    : '?';
+  const displayNumber = (card.number === undefined || card.number === null || card.number === -1) 
+    ? '?' 
+    : String(card.number);
   
   const frontStyle = useAnimatedStyle(() => ({
     opacity: interpolate(flipAnim.value, [0, 0.5, 1], [0, 0, 1]),
